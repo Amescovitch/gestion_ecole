@@ -1,0 +1,142 @@
+{% load static %}
+<html lang="fr">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static '/images/favicon.png' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Connexion GE</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+    <style>
+        body{
+            background-color: white;
+            font-family: Arial;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 83vh;
+        }
+
+        .ecole_image{
+            background-image: url("{% static 'images/ecole_image.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-color: rgb(18, 98, 129);
+        }
+
+        .formulaire_connexion{
+            background-color: rgb(18, 98, 129);
+            border-left: 4px solid white;
+        }
+
+        .error_connexion{
+            font-size: 14px;
+            color: yellow;
+        }
+
+        #username, #password{
+            font-size: 14px;
+        }
+
+        #button{
+            font-size: 14px;
+            background-color: wheat;
+            color: black;
+            border: none;
+            font-weight: bold;
+        }
+
+        #button:hover{
+            background-color: white;
+        }
+
+        .mot_de_passe_oublie{
+            color: yellow;
+            font-size: 14px;
+        }
+
+        .mot_de_passe_oublie:hover{
+            color: white;
+        }
+     
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block ecole_image"></div>
+                            <div class="col-lg-6 formulaire_connexion">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 style="font-weight: bold;" class="h5 text-white mb-4">NOM DE L'APPLICATION</h1>
+                                    </div>
+                                    <form method="post" class="user">
+                                        <div class="mb-3">
+                                    
+                                        {% csrf_token %}
+                                        {% if error_message %}
+                                            <p class="error_connexion">{{ error_message }}</p>
+                                        {% endif %}
+                                        
+                                        <div class="form-group">
+                                            <input type="text" id="username" name="username" class="form-control form-control-user" placeholder="Entrez votre nom d'utilisateur..." required>
+                                        </div>
+                                            <div class="form-group">
+                                            <input type="password" class="form-control form-control-user" id="password" name="password" class="form-control" placeholder="Votre mot de passe" required>
+                                        </div>
+                                        <div class="text-center form-control form-control-user" style="margin-bottom: 15px; padding: 10px; height: 50px;">
+                                            {{ form.captcha }}
+                                        </div>                                        
+                                        <button type="submit" class="btn btn-primary btn-user btn-block" id="button">Connexion</button>                           
+                                    </form>
+                                    <hr>
+                                    <div class="text-center">
+                                        <a class="mot_de_passe_oublie" href="#">Mot de passe oublié ?</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+</body>
+
+</html>
