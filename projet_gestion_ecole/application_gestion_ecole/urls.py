@@ -1,5 +1,4 @@
 from application_gestion_ecole.views import *
-from . import views as custom_auth_views
 from django.urls import path
 
 app_name = 'application_gestion_ecole'
@@ -9,6 +8,10 @@ urlpatterns = [
 
     #tableaux de bord
     path('tableau_de_bord/', tableau_de_bord, name="tableau_de_bord"),
+
+    #classe note
+    path('classe/<int:classe_id>/notes/', classe_notes, name='classe_notes'),
+
 
     #réinitialisation de mot de passe
     #path('password_reset/', custom_auth_views.custom_password_reset, name='password_reset'),

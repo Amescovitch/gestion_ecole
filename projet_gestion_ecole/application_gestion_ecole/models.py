@@ -1,24 +1,20 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, nom, prenom, sexe, username, email, password):
-        # Crée un utilisateur avec les champs fournis
         user = self.model(
             nom=nom,
             prenom=prenom,
             sexe=sexe,
             username=username,
             email=self.normalize_email(email),
-            password=password,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, nom, prenom, sexe, username, email, password):
-        # Crée un superutilisateur avec les champs fournis
         user = self.create_user(
             nom=nom,
             prenom=prenom,
@@ -31,9 +27,8 @@ class CustomUserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
-    
-class Utilisateur(AbstractBaseUser, PermissionsMixin):
 
+class Utilisateur(AbstractBaseUser, PermissionsMixin):
     SEXE_CHOICES = (
         ('M', 'Masculin'),
         ('F', 'Féminin'),
@@ -47,6 +42,10 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    # Attributs spécifiques à la classe Professeur
+    code = models.CharField(max_length=10, unique=True, blank=True, null=True)
+    classes_en_charges = models.ManyToManyField('Classe', through='ClasseMatiereProfesseur', blank=True)
+
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'username'
@@ -54,58 +53,78 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.nom} {self.prenom}"
-    
 
-class Classe(models.Model):
-    code = models.CharField(max_length=10, unique=True)
-    libelle = models.CharField(max_length=25, unique=True)
+class AnneeAcademique(models.Model):
+    annee_debut = models.IntegerField()
+    annee_fin = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.annee_debut}-{self.annee_fin}"
+
+class TrancheAcademique(models.Model):
+    code = models.PositiveIntegerField()
+    libelle = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.libelle
 
 class Matiere(models.Model):
     code = models.CharField(max_length=10, unique=True)
     nom = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.nom
+
 class Eleve(models.Model):
-    numero = models.CharField(max_length=10, unique=True)
-    cle = models.CharField(max_length=50)
     nom = models.CharField(max_length=50)
     prenom = models.CharField(max_length=50)
     date_naissance = models.DateField()
-    sexe = models.SmallIntegerField()
+    sexe = models.CharField(max_length=1, choices=Utilisateur.SEXE_CHOICES)
+    classe = models.ForeignKey('Classe', on_delete=models.CASCADE, null=True, blank=True)
 
-class Professeur(models.Model):
+    def __str__(self):
+        return f"{self.nom} {self.prenom}"
+
+class Classe(models.Model):
     code = models.CharField(max_length=10, unique=True)
-    nom = models.CharField(max_length=50)
-    prenom = models.CharField(max_length=50)
-    classes = models.ManyToManyField('Classe', through='ProfesseurClasse')
+    libelle = models.CharField(max_length=25, unique=True)
+    titulaire = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, blank=True)
 
-class ProfesseurClasse(models.Model):
-    professeur = models.ForeignKey(Professeur, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.code
+
+class ClasseMatiereProfesseur(models.Model):
+    professeur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
     matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)
-    annee_academique = models.IntegerField(default=0)
-    tranche_academique = models.IntegerField(default=0)
-    titulaire = models.BooleanField(default=False)
+    annee_academique = models.ForeignKey(AnneeAcademique, on_delete=models.CASCADE)
+    tranche_academique = models.ForeignKey(TrancheAcademique, on_delete=models.CASCADE)
+    coefficient = models.FloatField()
 
-class Appartenance(models.Model):
+class ClasseEleve(models.Model):
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
-    eleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
+    eleve = models.ManyToManyField(Eleve)
 
 class Appreciation(models.Model):
-    intervalle1 = models.CharField(max_length=5, default='0')
-    libelle = models.CharField(max_length=25)
-    intervalle2 = models.CharField(max_length=5, default='0')
-    couleur = models.CharField(max_length=10)
+    texte = models.CharField(max_length=50)
+    intervalle_debut = models.FloatField()
+    intervalle_fin = models.FloatField()
 
-class Composition(models.Model):
+    def __str__(self):
+        return self.texte
+
+class NoteEvaluation(models.Model):
     eleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)
-    annee_academique = models.IntegerField()
-    tranche_academique = models.IntegerField()
-    appreciation = models.ForeignKey(Appreciation, on_delete=models.CASCADE)
-    note_classe = models.FloatField(null=True)
-    note_devoir = models.FloatField(null=True)
-    note_composition = models.FloatField(null=True)
-    moyenne_sur_20 = models.FloatField(null=True)
-    note_definitive = models.FloatField(null=True)
-    rang = models.CharField(max_length=10)
-    appreciation_textuelle = models.CharField(max_length=50)
+    annee_academique = models.ForeignKey(AnneeAcademique, on_delete=models.CASCADE)
+    tranche_academique = models.ForeignKey(TrancheAcademique, on_delete=models.CASCADE)
+    note_classe = models.FloatField(null=True, blank=True)
+    note_devoir = models.FloatField(null=True, blank=True)
+    note_composition = models.FloatField(null=True, blank=True)
+    moyenne_sur_20 = models.FloatField(null=True, blank=True)
+    note_definitive = models.FloatField(null=True, blank=True)
+    rang = models.CharField(max_length=10, blank=True)
+    appreciation = models.ForeignKey(Appreciation, on_delete=models.CASCADE, blank=True)
+
+    def __str__(self):
+        return f"{self.eleve} - {self.matiere} - {self.annee_academique} - {self.tranche_academique}"

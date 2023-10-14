@@ -65,6 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'application_gestion_ecole.context_processors.classes_context.classes_en_charge',
             ],
         },
     },
