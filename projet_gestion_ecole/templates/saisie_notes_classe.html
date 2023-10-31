@@ -43,9 +43,9 @@
           {% with note=notes_evaluation|get_by_eleve:eleve %}
             <tr>
               <td style="white-space: nowrap; vertical-align: middle; color: black; font-size: 14px;">{{ eleve }}</td>
-              <td><input type="number" class="form-control" name="note_classe{{ eleve.id }}" value="{{ note.formatted_classe}}" oninput="calculateMoyenne({{ eleve.id }})"></td>
-              <td><input type="number" class="form-control" name="note_devoir{{ eleve.id }}" value="{{ note.formatted_devoir }}" oninput="calculateMoyenne({{ eleve.id }})"></td>
-              <td><input type="number" class="form-control" name="note_composition{{ eleve.id }}" value="{{ note.formatted_composition }}" oninput="calculateMoyenne({{ eleve.id }})"></td>
+              <td><input type="number" step="0.01" class="form-control" name="note_classe{{ eleve.id }}" value="{{ note.formatted_classe}}" oninput="calculateMoyenne({{ eleve.id }})"></td>
+              <td><input type="number" step="0.01" class="form-control" name="note_devoir{{ eleve.id }}" value="{{ note.formatted_devoir }}" oninput="calculateMoyenne({{ eleve.id }})"></td>
+              <td><input type="number" step="0.01" class="form-control" name="note_composition{{ eleve.id }}" value="{{ note.formatted_composition }}" oninput="calculateMoyenne({{ eleve.id }})"></td>
               <td><input type="number" class="form-control" name="moyenne_sur_20{{ eleve.id }}" value="{{ note.formatted_moyenne_sur_20 }}" readonly></td>
               <td><input type="number" class="form-control" name="coefficient{{ eleve.id }}" value="{{ coefficient }}" readonly oninput="calculateMoyenne({{ eleve.id }})"></td>
               <td><input type="number" class="form-control" name="note_definitive{{ eleve.id }}" value="{{ note.formatted_note_definitive }}" readonly></td>
