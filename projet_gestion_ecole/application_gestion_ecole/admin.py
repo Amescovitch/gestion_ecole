@@ -25,7 +25,7 @@ class TrancheAcademiqueAdmin(admin.ModelAdmin):
 
 @admin.register(Matiere)
 class MatiereAdmin(admin.ModelAdmin):
-    list_display = ['code', 'nom']
+    list_display = ['code', 'nom', 'id']
 
 @admin.register(Eleve)
 class EleveAdmin(admin.ModelAdmin):
@@ -33,7 +33,7 @@ class EleveAdmin(admin.ModelAdmin):
 
 @admin.register(Classe)
 class ClasseAdmin(admin.ModelAdmin):
-    list_display = ['code', 'libelle', 'titulaire']
+    list_display = ['code', 'libelle', 'est_semestre', 'titulaire', 'id']
 
 @admin.register(ClasseMatiereProfesseur)
 class ClasseMatiereProfesseurAdmin(admin.ModelAdmin):
@@ -48,10 +48,6 @@ class ClasseEleveAdmin(admin.ModelAdmin):
 
     display_eleves.short_description = 'Élèves'
 
-@admin.register(Appreciation)
-class AppreciationAdmin(admin.ModelAdmin):
-    list_display = ['texte', 'intervalle_debut', 'intervalle_fin']
-
 @admin.register(NoteEvaluation)
 class NoteEvaluationAdmin(admin.ModelAdmin):
-    list_display = ['eleve', 'matiere', 'annee_academique', 'tranche_academique', 'note_classe', 'note_devoir', 'note_composition', 'moyenne_sur_20', 'note_definitive', 'rang', 'appreciation']
+    list_display = ['annee_academique', 'tranche_academique', 'classe', 'matiere', 'eleve', 'note_classe', 'note_devoir', 'note_composition', 'moyenne_sur_20', 'note_definitive', 'rang', 'appreciation']

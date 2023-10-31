@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Connexion GE</title>
+    <title>authentification probul</title>
 
     <!-- Custom fonts for this template-->
     <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
@@ -29,15 +29,16 @@
         }
 
         .ecole_image{
-            background-image: url("{% static 'images/ecole_image.jpg' %}");
+            background-image: url("{% static 'images/gestion-ecole.jpg' %}");
             background-size: cover;
             background-position: center;
-            background-color: rgb(18, 98, 129);
+            background-color: rgb(46, 104, 46);
         }
 
         .formulaire_connexion{
-            background-color: rgb(18, 98, 129);
+            background-color: rgb(46, 104, 46);
             border-left: 4px solid white;
+
         }
 
         .error_connexion{
@@ -51,8 +52,8 @@
 
         #button{
             font-size: 14px;
-            background-color: wheat;
-            color: black;
+            background-color: white;
+            color: rgb(102, 68, 68);
             border: none;
             font-weight: bold;
         }
@@ -62,7 +63,7 @@
         }
 
         .mot_de_passe_oublie{
-            color: yellow;
+            color: white;
             font-size: 14px;
         }
 
@@ -90,7 +91,15 @@
                             <div class="col-lg-6 formulaire_connexion">
                                 <div class="p-5">
                                     <div class="text-center">
-                                        <h1 style="font-weight: bold;" class="h5 text-white mb-4">NOM DE L'APPLICATION</h1>
+                                        
+                                        <h1 style="font-weight: bold;" class="h5 text-white mb-4">
+                                            <a class="sidebar-brand d-flex align-items-center justify-content-center" style="margin-top: -40px;" href="#">
+                                                <div class="sidebar-brand-icon rotate-n-15">
+                                                    <i style="color: white; font-size: 30px;" class="fas fa-graduation-cap"></i>
+                                                </div>
+                                                <div class="sidebar-brand-text mx-3" style="color: white; font-size: 25px;">PROBUL</div>
+                                            </a>
+                                        </h1>
                                     </div>
                                     <form method="post" class="user">
                                         <div class="mb-3">
@@ -106,13 +115,13 @@
                                             <div class="form-group">
                                             <input type="password" class="form-control form-control-user" id="password" name="password" class="form-control" placeholder="Votre mot de passe" required>
                                         </div>
-                                        <!-- <div class="text-center form-control form-control-user" style="margin-bottom: 15px; padding: 10px; height: 50px;">
+                                        <div class="text-center form-control form-control-user" style="margin-bottom: 15px; padding: 10px; height: 50px;">
                                             {{ form.captcha }}
-                                        </div>    -->                                     
+                                        </div>                                        
                                         <button type="submit" class="btn btn-primary btn-user btn-block" id="button">Connexion</button>                           
                                     </form>
                                     <hr>
-                                    <div class="text-center">
+                                    <div class="text-center" style="margin-bottom: -50px;">
                                         <a class="mot_de_passe_oublie" href="#">Mot de passe oublié ?</a>
                                     </div>
                                 </div>

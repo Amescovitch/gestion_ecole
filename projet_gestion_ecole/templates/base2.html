@@ -17,6 +17,12 @@
     <!-- Custom styles for this template-->
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
 
+    <style>
+        #accordionSidebar{
+            background-color: rgb(46, 104, 46);
+        }
+    </style>
+
 </head>
 
 <body id="page-top">
@@ -25,14 +31,14 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
                 <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-info"></i>
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">APPLICATION</div>
+                <div class="sidebar-brand-text mx-3">Probul</div>
             </a>
 
             <!-- Divider -->
@@ -40,22 +46,25 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{% url 'application_gestion_ecole:tableau_de_bord' %}">
                     <i class="fas fa-fw fa-home"></i>
                     <span>Tableau de bord</span></a>
             </li>
 
+            {% if user.is_staff %}
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'admin:application_gestion_ecole_utilisateur_changelist' %}">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Administration</span></a>
             </li>
+            {% endif %}
 
             <!-- Divider -->
             <hr class="sidebar-divider">
 
             {% if not user.is_staff %}
             <!-- Nav Item - Pages Collapse Menu -->
+            <!-- Exemple de modèle HTML (template de base) -->
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
@@ -64,12 +73,17 @@
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        {% for classe in classes_en_charge %}
-                            <a class="collapse-item" href="{% url 'application_gestion_ecole:classe_notes' classe.id %}">{{ classe.libelle }}</a>
+                        {% for classe_info in classes_en_charge %}
+                            <a class="collapse-item" href="{% url 'application_gestion_ecole:saisie_notes_classe' classe_info.classe__id classe_info.matiere__id %}">
+                                {{ classe_info.classe__libelle }} - {{ classe_info.matiere__code }}
+                            </a>
                         {% endfor %}
+
+
                     </div>
                 </div>
             </li>
+
             {% endif %}
         </ul>
         <!-- End of Sidebar -->
@@ -81,7 +95,7 @@
             <div id="content">
 
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">               
+                <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top" style="background-color: rgb(255, 176, 131); color: black; letter-spacing: 1; height: 45px;">               
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
@@ -92,7 +106,7 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.username }}</span>
+                                <span class="mr-2 d-none d-lg-inline small" style="color: black;"> <strong>Bienvenue, </strong>{{ user.username }}</span>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -111,7 +125,7 @@
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
+                <div class="container-fluid" style="background-color: white;">
                     {% block content %}
         
                     {% endblock %}
@@ -120,10 +134,10 @@
             <!-- End of Main Content -->
             </div>
             <!-- Footer -->
-            <footer class="sticky-footer bg-white">
+            <footer class="sticky-footer" style="background-color: rgb(255, 176, 131); height: 10px; padding: 20px; letter-spacing: 1; color: black;">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; application name 2023</span>
+                        <span>Copyright &copy; Probul 2023. Tous droits réservés.</span>
                     </div>
                 </div>
             </footer>

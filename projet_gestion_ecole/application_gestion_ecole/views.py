@@ -1,6 +1,7 @@
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
+from datetime import date
 from .models import *
 from .forms import *
 
@@ -39,22 +40,83 @@ def connexion(request):
 def tableau_de_bord(request):
     return render(request, 'tableau_de_bord.html')
 
-def classe_notes(request, classe_id):
-    classe = Classe.objects.get(pk=classe_id)
-    
-    # Récupérer les professeurs associés à la classe
-    professeurs = Utilisateur.objects.filter(classes_en_charges=classe)
+def saisie_notes_classe(request, classe_id, matiere_id):
+    utilisateur = request.user
+    classe = get_object_or_404(Classe, id=classe_id)
+    matiere = get_object_or_404(Matiere, id=matiere_id)
 
-    # Récupérer les élèves associés aux professeurs
-    eleves = Eleve.objects.filter(classe=classe, professeur__in=professeurs)
+    annee_academique_en_cours = AnneeAcademique.objects.filter(
+        annee_debut__lte=date.today().year,
+        annee_fin__gte=date.today().year
+    ).first()
 
-    # Récupérer les notes associées à ces élèves
-    notes = NoteEvaluation.objects.filter(eleve__in=eleves)
+    coefficient = ClasseMatiereProfesseur.objects.filter(
+        classe=classe,
+        matiere=matiere,
+    ).first().coefficient
 
-    context = {
-        'classe': classe,
-        'eleves': eleves,
-        'notes': notes,
-    }
+    effectif = Eleve.objects.filter(classe=classe).count()
 
-    return render(request, 'classe_notes.html', context)
+    if classe.est_semestre:
+        tranche_academique = "Premier semestre"
+    else:
+        tranche_academique = "Premier trimestre"
+
+    eleves = Eleve.objects.filter(classe=classe)
+    notes_evaluation = NoteEvaluation.objects.filter(
+        classe=classe,
+        matiere=matiere,
+    ).select_related('eleve')
+
+    if request.method == 'POST':
+        for eleve in classe.eleve_set.all():
+            note_classe = request.POST.get(f"note_classe{eleve.id}")
+            note_devoir = request.POST.get(f"note_devoir{eleve.id}")
+            note_composition = request.POST.get(f"note_composition{eleve.id}")
+            moyenne_sur_20 = request.POST.get(f"moyenne_sur_20{eleve.id}")
+            coefficient = request.POST.get(f"coefficient{eleve.id}")
+            note_definitive = request.POST.get(f"note_definitive{eleve.id}")
+            rang = request.POST.get(f"rang{eleve.id}")
+            appreciation = request.POST.get(f"appreciation{eleve.id}")
+
+            note, created = NoteEvaluation.objects.get_or_create(
+                eleve=eleve,
+                matiere=matiere,
+                classe=classe,
+                defaults={
+                    "note_classe": note_classe,
+                    "note_devoir": note_devoir,
+                    "note_composition": note_composition,
+                    "moyenne_sur_20": moyenne_sur_20,
+                    "coefficient": coefficient,
+                    "note_definitive": note_definitive,
+                    "rang": rang,
+                    "appreciation": appreciation,
+                    "annee_academique": annee_academique_en_cours,
+                    "tranche_academique": tranche_academique,
+                }
+            )
+            if not created:
+                note.note_classe = note_classe
+                note.note_devoir = note_devoir
+                note.note_composition = note_composition
+                note.moyenne_sur_20 = moyenne_sur_20
+                note.coefficient = coefficient
+                note.note_definitive = note_definitive
+                note.rang = rang
+                note.appreciation = appreciation
+                note.save()
+
+        return redirect('application_gestion_ecole:saisie_notes_classe', classe_id=classe_id, matiere_id=matiere_id)
+    else:
+        context = {
+            'eleves': eleves,
+            'notes_evaluation': notes_evaluation,
+            'classe': classe,
+            'matiere': matiere,
+            'annee_academique_en_cours': annee_academique_en_cours,
+            'coefficient': coefficient,
+            'effectif': effectif,
+            'tranche_academique': tranche_academique,
+        }
+        return render(request, 'saisie_notes_classe.html', context)

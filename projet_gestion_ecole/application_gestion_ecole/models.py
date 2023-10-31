@@ -73,7 +73,7 @@ class Matiere(models.Model):
     nom = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.nom
+        return self.code
 
 class Eleve(models.Model):
     nom = models.CharField(max_length=50)
@@ -89,6 +89,7 @@ class Classe(models.Model):
     code = models.CharField(max_length=10, unique=True)
     libelle = models.CharField(max_length=25, unique=True)
     titulaire = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, blank=True)
+    est_semestre = models.BooleanField(default=False)  # Champ booléen pour indiquer le type (par défaut, trimestre)
 
     def __str__(self):
         return self.code
@@ -99,32 +100,45 @@ class ClasseMatiereProfesseur(models.Model):
     matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)
     annee_academique = models.ForeignKey(AnneeAcademique, on_delete=models.CASCADE)
     tranche_academique = models.ForeignKey(TrancheAcademique, on_delete=models.CASCADE)
-    coefficient = models.FloatField()
+    coefficient = models.PositiveIntegerField()
 
 class ClasseEleve(models.Model):
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
     eleve = models.ManyToManyField(Eleve)
 
-class Appreciation(models.Model):
-    texte = models.CharField(max_length=50)
-    intervalle_debut = models.FloatField()
-    intervalle_fin = models.FloatField()
-
-    def __str__(self):
-        return self.texte
-
 class NoteEvaluation(models.Model):
-    eleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
-    matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)
-    annee_academique = models.ForeignKey(AnneeAcademique, on_delete=models.CASCADE)
-    tranche_academique = models.ForeignKey(TrancheAcademique, on_delete=models.CASCADE)
     note_classe = models.FloatField(null=True, blank=True)
     note_devoir = models.FloatField(null=True, blank=True)
     note_composition = models.FloatField(null=True, blank=True)
     moyenne_sur_20 = models.FloatField(null=True, blank=True)
+
+    coefficient = models.PositiveIntegerField(blank=True, default=None)
+
     note_definitive = models.FloatField(null=True, blank=True)
-    rang = models.CharField(max_length=10, blank=True)
-    appreciation = models.ForeignKey(Appreciation, on_delete=models.CASCADE, blank=True)
+    rang = models.CharField(max_length=10, blank=True, null=True, default='----nc----')
+    appreciation = models.CharField(max_length=50, blank=True, null=True, default='----nc----')
+
+    classe = models.ForeignKey('Classe', on_delete=models.CASCADE, null=True, blank=True, default=None)
+    eleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
+    matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)
+    annee_academique = models.ForeignKey(AnneeAcademique, on_delete=models.CASCADE)
+    tranche_academique = models.CharField(max_length=100, default="")
+    professeur = models.ForeignKey('Utilisateur', on_delete=models.SET_NULL, null=True, blank=True, default=None)
 
     def __str__(self):
         return f"{self.eleve} - {self.matiere} - {self.annee_academique} - {self.tranche_academique}"
+    
+    def formatted_devoir(self):
+            return '{:.2f}'.format(self.note_devoir) if self.note_devoir is not None else ''
+
+    def formatted_composition(self):
+        return '{:.2f}'.format(self.note_composition) if self.note_composition is not None else ''
+
+    def formatted_moyenne_sur_20(self):
+        return '{:.2f}'.format(self.moyenne_sur_20) if self.moyenne_sur_20 is not None else ''
+    
+    def formatted_classe(self):
+            return '{:.2f}'.format(self.note_classe) if self.note_classe is not None else ''
+
+    def formatted_note_definitive(self):
+        return '{:.2f}'.format(self.note_definitive) if self.note_definitive is not None else ''

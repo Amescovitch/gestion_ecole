@@ -1,0 +1,195 @@
+<title>Saisie de notes de classe</title>
+{% extends 'base2.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<style>
+    .form-control{
+        color: black;
+        font-size: 14px;
+        background-color: white;
+        height: 25px;
+    }
+    th{
+      font-weight: normal;
+      text-align: center;
+      font-size: 15px;
+      letter-spacing: 1;
+    }
+</style>
+
+<p style="color: black; text-align: center; letter-spacing: 1; font-size: 15px; margin-bottom: 0;">Année scolaire : <strong>{{ annee_academique_en_cours }} -- {{ tranche_academique }}</strong> &emsp;&emsp; Classe : <strong>{{ classe }}</strong> &emsp;&emsp; Effectif : <strong>{{ effectif }}</strong> &emsp;&emsp; Matière : <strong>{{ matiere.code }}</strong> &emsp;&emsp; Coeff : <strong>{{ coefficient }}</strong></p>
+
+<form method="post" id="saisieForm">
+    {% csrf_token %}
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead style="background-color: rgb(255, 176, 131); color: black;">
+        <tr>
+          <th scope="col">Élève</th>
+          <th scope="col">Classe</th>
+          <th scope="col">Devoir</th>
+          <th scope="col">Compo</th>
+          <th scope="col">Moy/20</th>
+          <th scope="col">Coef</th>
+          <th scope="col">Note def</th>
+          <th scope="col">Rang</th>
+          <th scope="col">Appréciation</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for eleve in eleves %}
+          {% with note=notes_evaluation|get_by_eleve:eleve %}
+            <tr>
+              <td style="white-space: nowrap; vertical-align: middle; color: black; font-size: 14px;">{{ eleve }}</td>
+              <td><input type="number" class="form-control" name="note_classe{{ eleve.id }}" value="{{ note.formatted_classe}}" oninput="calculateMoyenne({{ eleve.id }})"></td>
+              <td><input type="number" class="form-control" name="note_devoir{{ eleve.id }}" value="{{ note.formatted_devoir }}" oninput="calculateMoyenne({{ eleve.id }})"></td>
+              <td><input type="number" class="form-control" name="note_composition{{ eleve.id }}" value="{{ note.formatted_composition }}" oninput="calculateMoyenne({{ eleve.id }})"></td>
+              <td><input type="number" class="form-control" name="moyenne_sur_20{{ eleve.id }}" value="{{ note.formatted_moyenne_sur_20 }}" readonly></td>
+              <td><input type="number" class="form-control" name="coefficient{{ eleve.id }}" value="{{ coefficient }}" readonly oninput="calculateMoyenne({{ eleve.id }})"></td>
+              <td><input type="number" class="form-control" name="note_definitive{{ eleve.id }}" value="{{ note.formatted_note_definitive }}" readonly></td>
+              <td><input type="text" class="form-control" name="rang{{ eleve.id }}" value="{{ note.rang }}" readonly></td>
+              <td><input type="text" class="form-control" name="appreciation{{ eleve.id }}" value="{{ note.appreciation }}" readonly></td>
+            </tr>
+          {% endwith %}
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary col-lg-2" style="background-color: rgb(255, 176, 131); border: none; border-radius: 0; color: black;">OK</button>
+  </div>
+</form>
+
+<script>
+
+    function calculateMoyenne(studentId) {
+  // Récupérer les valeurs des champs de devoir, classe, composition et coefficient
+  var devoir = parseFloat(document.querySelector(`[name="note_devoir${studentId}"]`).value) || 0;
+  var classe = parseFloat(document.querySelector(`[name="note_classe${studentId}"]`).value) || 0;
+  var compo = parseFloat(document.querySelector(`[name="note_composition${studentId}"]`).value) || 0;
+  var coefficient = parseFloat(document.querySelector(`[name="coefficient${studentId}"]`).value) || 0;
+
+  // Vérifier si l'une des valeurs dépasse 20
+  if (devoir > 20) {
+    document.querySelector(`[name="note_devoir${studentId}"]`).value = 0;
+  } else if (classe > 20) {
+    document.querySelector(`[name="note_classe${studentId}"]`).value = 0;
+  } else if (compo > 20) {
+    document.querySelector(`[name="note_composition${studentId}"]`).value = 0;
+  }
+
+  // Vérifier si l'une des valeurs < 0
+  if (devoir < 0) {
+    document.querySelector(`[name="note_devoir${studentId}"]`).value = 0;
+  } else if (classe < 0) {
+    document.querySelector(`[name="note_classe${studentId}"]`).value = 0;
+  } else if (compo < 0) {
+    document.querySelector(`[name="note_composition${studentId}"]`).value = 0;
+  }
+
+ // Vérifier si l'une des notes de devoir ou de composition manque
+  if ((devoir === 0 && compo === 0) || (devoir === 0 && compo < 20) || (devoir < 20 && compo === 0)) {
+    // Reset all fields and set "non classé"
+    resetFields(studentId);
+    return;
+  }
+
+  // Calculer la moyenne sur 20
+  var moyenne = (((devoir + classe) / 2 ) + compo) / 2;
+
+  // Limiter la moyenne à 20
+  moyenne = Math.min(moyenne, 20);
+
+  // Mettre à jour le champ de la moyenne sur 20
+  document.querySelector(`[name="moyenne_sur_20${studentId}"]`).value = moyenne.toFixed(2);
+
+  // Calculer la moyenne définitive en multipliant par le coefficient
+  var moyenneDefinitive = moyenne * coefficient;
+
+  // Mettre à jour le champ de la moyenne définitive
+  document.querySelector(`[name="note_definitive${studentId}"]`).value = moyenneDefinitive.toFixed(2);
+
+  // Mettre à jour l'appréciation en fonction de la moyenne sur 20
+  var appreciation = calculateAppreciation(moyenne);
+  document.querySelector(`[name="appreciation${studentId}"]`).value = appreciation;
+
+  // Appel de la fonction pour mettre à jour le classement
+  updateRanking();
+}
+
+function resetFields(studentId) {
+  // Reset all relevant fields and set "non classé"
+  document.querySelector(`[name="moyenne_sur_20${studentId}"]`).value = "----nc----";
+  document.querySelector(`[name="note_definitive${studentId}"]`).value = "----nc----";
+  document.querySelector(`[name="rang${studentId}"]`).value = "----nc----";
+  document.querySelector(`[name="appreciation${studentId}"]`).value = "----nc----";
+  // You may want to add more reset logic here if needed
+}
+
+function calculateAppreciation(moyenne) {
+  if (moyenne === undefined ) {
+    return "----nc----";
+  } else if (moyenne >= 0 && moyenne < 3) {
+    return "Faible";
+  } else if (moyenne >= 3 && moyenne < 5) {
+    return "Médiocre";
+  } else if (moyenne >= 5 && moyenne < 6) {
+    return "Mauvais";
+  } else if (moyenne >= 6 && moyenne < 8) {
+    return "Très insuffisant";
+  } else if (moyenne >= 8 && moyenne < 10) {
+    return "Insuffisant";
+  } else if (moyenne >= 10 && moyenne < 12) {
+    return "Passable";
+  } else if (moyenne >= 12 && moyenne < 14) {
+    return "Assez bien";
+  } else if (moyenne >= 14 && moyenne < 16) {
+    return "Bien";
+  } else if (moyenne >= 16 && moyenne < 18) {
+    return "Très bien";
+  } else if (moyenne >= 18 && moyenne < 20) {
+    return "Excellent";
+  } else if (moyenne === 20) {
+    return "Parfait";
+  } else {
+    return "À améliorer";
+  }
+}
+
+function updateRanking() {
+  // Récupérer toutes les moyennes
+  var moyennes = document.querySelectorAll('[name^="moyenne_sur_20"]');
+
+  // Créer un tableau pour stocker les moyennes et les ID d'élèves associés
+  var moyennesArray = [];
+  moyennes.forEach(function (moyenneInput) {
+    var moyenne = parseFloat(moyenneInput.value) || 0;
+    var studentId = moyenneInput.name.replace('moyenne_sur_20', '');
+    moyennesArray.push({ studentId: studentId, moyenne: moyenne });
+  });
+
+  // Trier le tableau en fonction des moyennes, du plus grand au plus petit
+  moyennesArray.sort(function (a, b) {
+    return b.moyenne - a.moyenne;
+  });
+
+  // Mettre à jour les rangs
+  var currentRank = 1;
+  moyennesArray.forEach(function (entry, index) {
+    var studentId = entry.studentId;
+    var rankInput =  document.querySelector(`[name="rang${studentId}"]`);
+
+    // Mettre à jour le rang uniquement si la moyenne est différente de la précédente
+    if (index === 0 || entry.moyenne !== moyennesArray[index - 1].moyenne) {
+      rankInput.value = currentRank;
+    }
+
+    // Incrémenter le rang uniquement si la moyenne est différente de la suivante
+    if (index < moyennesArray.length - 1 && entry.moyenne !== moyennesArray[index + 1].moyenne) {
+      currentRank++;
+    }
+  });
+}
+
+</script>
+{% endblock %}
