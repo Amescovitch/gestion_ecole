@@ -39,87 +39,6 @@ def connexion(request):
 
 def tableau_de_bord(request):
     return render(request, 'tableau_de_bord.html')
-""" 
-def saisie_notes_classe(request, classe_id, matiere_id):
-    utilisateur = request.user
-    classe = get_object_or_404(Classe, id=classe_id)
-    matiere = get_object_or_404(Matiere, id=matiere_id)
-
-    annee_academique_en_cours = AnneeAcademique.objects.filter(
-        annee_debut__lte=date.today().year,
-        annee_fin__gte=date.today().year
-    ).first()
-
-    coefficient = ClasseMatiereProfesseur.objects.filter(
-        classe=classe,
-        matiere=matiere,
-    ).first().coefficient
-
-    effectif = Eleve.objects.filter(classe=classe).count()
-
-    if classe.est_semestre:
-        tranche_academique = "Premier semestre"
-    else:
-        tranche_academique = "Premier trimestre"
-
-    eleves = Eleve.objects.filter(classe=classe)
-    notes_evaluation = NoteEvaluation.objects.filter(
-        classe=classe,
-        matiere=matiere,
-    ).select_related('eleve')
-
-    if request.method == 'POST':
-        for eleve in classe.eleve_set.all():
-            note_classe = request.POST.get(f"note_classe{eleve.id}")
-            note_devoir = request.POST.get(f"note_devoir{eleve.id}")
-            note_composition = request.POST.get(f"note_composition{eleve.id}")
-            moyenne_sur_20 = request.POST.get(f"moyenne_sur_20{eleve.id}")
-            coefficient = request.POST.get(f"coefficient{eleve.id}")
-            note_definitive = request.POST.get(f"note_definitive{eleve.id}")
-            rang = request.POST.get(f"rang{eleve.id}")
-            appreciation = request.POST.get(f"appreciation{eleve.id}")
-
-            note, created = NoteEvaluation.objects.get_or_create(
-                eleve=eleve,
-                matiere=matiere,
-                classe=classe,
-                defaults={
-                    "note_classe": note_classe,
-                    "note_devoir": note_devoir,
-                    "note_composition": note_composition,
-                    "moyenne_sur_20": moyenne_sur_20,
-                    "coefficient": coefficient,
-                    "note_definitive": note_definitive,
-                    "rang": rang,
-                    "appreciation": appreciation,
-                    "annee_academique": annee_academique_en_cours,
-                    "tranche_academique": tranche_academique,
-                }
-            )
-            if not created:
-                note.note_classe = note_classe
-                note.note_devoir = note_devoir
-                note.note_composition = note_composition
-                note.moyenne_sur_20 = moyenne_sur_20
-                note.coefficient = coefficient
-                note.note_definitive = note_definitive
-                note.rang = rang
-                note.appreciation = appreciation
-                note.save()
-
-        return redirect('application_gestion_ecole:saisie_notes_classe', classe_id=classe_id, matiere_id=matiere_id)
-    else:
-        context = {
-            'eleves': eleves,
-            'notes_evaluation': notes_evaluation,
-            'classe': classe,
-            'matiere': matiere,
-            'annee_academique_en_cours': annee_academique_en_cours,
-            'coefficient': coefficient,
-            'effectif': effectif,
-            'tranche_academique': tranche_academique,
-        }
-        return render(request, 'saisie_notes_classe.html', context) """
 
 def saisie_notes_classe(request, classe_id, matiere_id):
     #utilisateur = request.user
@@ -232,3 +151,21 @@ def saisie_notes_classe(request, classe_id, matiere_id):
             'tranche_academique': tranche_academique,
         }
         return render(request, 'saisie_notes_classe.html', context)
+
+def inscription_eleve(request):
+    if request.method == 'POST':
+        form = EleveForm(request.POST, request.FILES)
+        if form.is_valid():
+            eleve = form.save()
+            nom = eleve.nom
+            prenom = eleve.prenom
+            success_message = f"Inscription de {nom} {prenom} réussie."
+            form.save()
+            
+            # Redirigez l'utilisateur vers la page d'inscription avec un message de succès
+            return render(request, 'inscription_eleve.html', {'form': EleveForm(), 'success_message': success_message})
+
+    else:
+        form = EleveForm()
+
+    return render(request, 'inscription_eleve.html', {'form': form})

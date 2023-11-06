@@ -7,5 +7,7 @@ urlpatterns = [
 
     path('tableau_de_bord/', tableau_de_bord, name="tableau_de_bord"),
 
+    path('inscription_eleve/', inscription_eleve, name="inscription_eleve"),
+
     path('saisie-notes-classe/<int:classe_id>/<int:matiere_id>/', saisie_notes_classe, name='saisie_notes_classe'),
 ]   

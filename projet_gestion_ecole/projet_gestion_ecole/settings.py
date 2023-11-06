@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'application_gestion_ecole',
     'captcha',
+    'phonenumbers',
 ]
 
 MIDDLEWARE = [

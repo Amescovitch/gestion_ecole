@@ -40,6 +40,51 @@
             -o-appearance: none;
             margin:0
         }
+
+        /* DÉBUT FORMULAIRES */
+    .formulaire {
+    padding: 20 10px;
+    background-color: white;
+    border: rgb(11, 126, 116) solid 1px;
+    }
+
+    .btn {
+    background-color: rgb(11, 126, 116);
+    margin-top: -10px;
+    margin-bottom: -45px;
+    width: 100%;    
+    height: 35px;
+    color: white;
+    }
+
+    .btn:hover {
+      background-color: rgb(39, 163, 153);
+      color: white;
+    }
+
+    label{
+    margin-left: 5px;
+    font-size: 15px;
+    margin-bottom:0;
+    }
+
+    .form-control{
+    color: black;
+    font-size: 15px;
+    padding-left: 5px;
+    }
+
+    .form-control:focus{
+    outline: none;
+    color: blue;
+    background-color: white;
+    }
+
+    .form-group{
+    margin-bottom: 25px;
+    }
+
+        /* FIN FORMULAIRE */
     </style>
 
 </head>
@@ -69,10 +114,15 @@
                     <i class="fas fa-fw fa-home"></i>
                     <span>Tableau de bord</span></a>
             </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'application_gestion_ecole:inscription_eleve' %}">
+                    <i class="fas fa-fw fa-user-plus"></i>
+                    <span>Inscription élève</span></a>
+            </li>
 
             {% if user.is_staff %}
             <li class="nav-item active">
-                <a class="nav-link" href="{% url 'admin:application_gestion_ecole_utilisateur_changelist' %}">
+                <a class="nav-link" href="{% url 'admin:application_gestion_ecole_utilisateur_changelist' %}" target="_blank">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Administration</span></a>
             </li>
@@ -133,7 +183,7 @@
                                 
                                 <a class="dropdown-item" href="{% url 'logout' %}">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
+                                    Déconnexion
                                 </a>
                             </div>
                         </li>
@@ -144,7 +194,7 @@
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid" style="background-color: white;">
+                <div class="container-fluid" style="">
                     {% block content %}
         
                     {% endblock %}

@@ -29,7 +29,10 @@ class MatiereAdmin(admin.ModelAdmin):
 
 @admin.register(Eleve)
 class EleveAdmin(admin.ModelAdmin):
-    list_display = ['nom', 'prenom', 'date_naissance', 'sexe', 'classe']
+    list_display = ['nom', 'prenom', 'date_naissance', 'sexe', 'classe', 'contact_parent1', 'contact_parent2', 'date_entree_etablissement']
+    search_fields = ['nom', 'prenom']
+    list_filter = ['classe']
+    #list_editable = ['contact_parent1', 'contact_parent2', 'date_entree_etablissement']
 
 @admin.register(Classe)
 class ClasseAdmin(admin.ModelAdmin):
@@ -38,15 +41,6 @@ class ClasseAdmin(admin.ModelAdmin):
 @admin.register(ClasseMatiereProfesseur)
 class ClasseMatiereProfesseurAdmin(admin.ModelAdmin):
     list_display = ['professeur', 'classe', 'matiere', 'annee_academique', 'tranche_academique', 'coefficient']
-
-@admin.register(ClasseEleve)
-class ClasseEleveAdmin(admin.ModelAdmin):
-    list_display = ['classe', 'display_eleves']
-
-    def display_eleves(self, obj):
-        return ", ".join([eleve.nom for eleve in obj.eleve.all()])
-
-    display_eleves.short_description = 'Élèves'
 
 @admin.register(NoteEvaluation)
 class NoteEvaluationAdmin(admin.ModelAdmin):

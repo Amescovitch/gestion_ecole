@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from phonenumber_field.modelfields import PhoneNumberField
 from django.db import models
 
 class CustomUserManager(BaseUserManager):
@@ -76,11 +77,20 @@ class Matiere(models.Model):
         return self.code
 
 class Eleve(models.Model):
+    image = models.ImageField(upload_to='eleve_images/', null=True, blank=True)
     nom = models.CharField(max_length=50)
-    prenom = models.CharField(max_length=50)
+    prenom = models.CharField(max_length=50) 
     date_naissance = models.DateField()
     sexe = models.CharField(max_length=1, choices=Utilisateur.SEXE_CHOICES)
     classe = models.ForeignKey('Classe', on_delete=models.CASCADE, null=True, blank=True)
+    parent1 = models.CharField(max_length=50, default='')
+    parent2 = models.CharField(max_length=50, default='', blank=True, null=True)
+    contact_parent1 = PhoneNumberField(default='')
+    contact_parent2 = PhoneNumberField(blank=True, null=True)
+    date_entree_etablissement = models.DateField(null=True, blank=True)
+    observation = models.TextField(default='', blank=True,)
+    nationalite = models.CharField(max_length=50, default='')
+    adresse = models.CharField(max_length=100, default='')
 
     def __str__(self):
         return f"{self.nom} {self.prenom}"
@@ -89,7 +99,7 @@ class Classe(models.Model):
     code = models.CharField(max_length=10, unique=True)
     libelle = models.CharField(max_length=25, unique=True)
     titulaire = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, blank=True)
-    est_semestre = models.BooleanField(default=False)  # Champ booléen pour indiquer le type (par défaut, trimestre)
+    est_semestre = models.BooleanField(default=False)
 
     def __str__(self):
         return self.code
@@ -102,22 +112,15 @@ class ClasseMatiereProfesseur(models.Model):
     tranche_academique = models.ForeignKey(TrancheAcademique, on_delete=models.CASCADE)
     coefficient = models.PositiveIntegerField()
 
-class ClasseEleve(models.Model):
-    classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
-    eleve = models.ManyToManyField(Eleve)
-
 class NoteEvaluation(models.Model):
     note_classe = models.FloatField(null=True, blank=True)
     note_devoir = models.FloatField(null=True, blank=True)
     note_composition = models.FloatField(null=True, blank=True)
     moyenne_sur_20 = models.FloatField(null=True, blank=True)
-
     coefficient = models.PositiveIntegerField(blank=True, default=None)
-
     note_definitive = models.FloatField(null=True, blank=True)
     rang = models.CharField(max_length=10, blank=True, null=True, default='----nc----')
     appreciation = models.CharField(max_length=50, blank=True, null=True, default='----nc----')
-
     classe = models.ForeignKey('Classe', on_delete=models.CASCADE, null=True, blank=True, default=None)
     eleve = models.ForeignKey(Eleve, on_delete=models.CASCADE)
     matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)

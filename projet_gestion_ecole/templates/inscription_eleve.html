@@ -1,0 +1,112 @@
+<title>Inscription élève</title>
+{% extends 'base2.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+
+<div class="container">
+    <h4 style="text-align: center; color: rgb(11, 126, 116); font-weight: bold; margin-top: -10px;">Inscription</h4>
+
+    <form style="max-width: 1000px;" method="post" enctype="multipart/form-data" class="formulaire container">
+        {% csrf_token %}
+
+        {% if success_message %}
+        <p style="box-shadow: 2px 2px 4px black; text-align: center; padding: 4px 20px; color: rgb(11, 126, 116);">{{ success_message }}</p>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-3">
+              <div class="form-group">
+                <label for="{{ form.nom.id_for_label }}">Nom<em style="color: red;">*</em></label><br>
+                {{ form.nom }}
+              </div>
+            </div>
+            <div class="col-lg-3">
+              <div class="form-group">
+                <label for="{{ form.prenom.id_for_label }}">Prénom(s)<em style="color: red;">*</em></label><br>
+                {{ form.prenom }}
+              </div>
+            </div>
+            
+            <div class="col-lg-3">
+              <div class="form-group">
+                <label for="{{ form.date_naissance.id_for_label }}">Date de naissance<em style="color: red;">*</em></label>
+                {{ form.date_naissance }}
+              </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                  <label for="{{ form.image.id_for_label }}">Photo d'identité</label>
+                  {{ form.image }}
+                </div>
+              </div>
+            <div class="col-lg-3">
+              <div class="form-group">
+                <label for="{{ form.sexe.id_for_label }}">Sexe<em style="color: red;">*</em></label><br>
+                {{ form.sexe }}
+              </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                  <label for="{{ form.nationalite.id_for_label }}">Nationalité<em style="color: red;">*</em></label>
+                  {{ form.nationalite }}
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                  <label for="{{ form.parent1.id_for_label }}">Parent 1<em style="color: red;">*</em></label>
+                  {{ form.parent1 }}
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                  <label for="{{ form.contact_parent1.id_for_label }}">Contact parent 1<em style="color: red;">*</em></label>
+                  {{ form.contact_parent1 }}
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                  <label for="{{ form.date_entree_etablissement.id_for_label }}">Date entrée (1ère fois)<em style="color: red;">*</em></label>
+                  {{ form.date_entree_etablissement }}
+                </div>
+            </div>
+                     
+            <div class="col-lg-3">
+                <div class="form-group">
+                  <label for="{{ form.classe.id_for_label }}">Classe<em style="color: red;">*</em></label><br>
+                  {{ form.classe }}
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                  <label for="{{ form.parent2.id_for_label }}">Parent 2</label>
+                  {{ form.parent2 }}
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                  <label for="{{ form.contact_parent2.id_for_label }}">Contact parent 2</label>
+                  {{ form.contact_parent2 }}
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="form-group">
+                  <label for="{{ form.adresse.id_for_label }}">Adresse<em style="color: red;">*</em></label>
+                  {{ form.adresse }}
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="form-group">
+                  <label for="{{ form.observation.id_for_label }}">Observation (informations sur l'élève)</label><br>
+                  {{ form.observation }}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+        <button type="submit" class="btn btn-primary">Inscrire</button>
+        </div>
+  </form>
+</div>
+
+{% endblock %}
