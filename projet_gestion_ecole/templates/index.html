@@ -93,7 +93,7 @@
                                     <div class="text-center">
                                         
                                         <h1 style="font-weight: bold;" class="h5 text-white mb-4">
-                                            <a class="sidebar-brand d-flex align-items-center justify-content-center" style="margin-top: -40px;" href="#">
+                                            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
                                                 <div class="sidebar-brand-icon rotate-n-15">
                                                     <i style="color: white; font-size: 30px;" class="fas fa-graduation-cap"></i>
                                                 </div>
@@ -102,9 +102,8 @@
                                         </h1>
                                     </div>
                                     <form method="post" class="user">
-                                        <div class="mb-3">
-                                    
                                         {% csrf_token %}
+
                                         {% if error_message %}
                                             <p class="error_connexion">{{ error_message }}</p>
                                         {% endif %}
@@ -115,13 +114,13 @@
                                             <div class="form-group">
                                             <input type="password" class="form-control form-control-user" id="password" name="password" class="form-control" placeholder="Votre mot de passe" required>
                                         </div>
-                                        <!-- <div class="text-center form-control form-control-user" style="margin-bottom: 15px; padding: 10px; height: 50px;">
+                                        <div class="text-center form-control form-control-user" style="margin-bottom: 15px; padding: 10px; height: 50px;">
                                             {{ form.captcha }}
-                                        </div> -->                                        
+                                        </div>                                      
                                         <button type="submit" class="btn btn-primary btn-user btn-block" id="button">Connexion</button>                           
                                     </form>
                                     <hr>
-                                    <div class="text-center" style="margin-bottom: -50px;">
+                                    <div class="text-center" style="margin-bottom: -10px">
                                         <a class="mot_de_passe_oublie" href="#">Mot de passe oublié ?</a>
                                     </div>
                                 </div>
